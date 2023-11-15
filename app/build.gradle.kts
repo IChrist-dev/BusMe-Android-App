@@ -51,4 +51,7 @@ dependencies {
 
     // Location Services
     implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    // GTFS
+    implementation("org.mobilitydata:gtfs-realtime-bindings:0.0.8")
 }
