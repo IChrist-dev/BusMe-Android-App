@@ -9,9 +9,12 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.transitapp.databinding.ActivityMainBinding
+import java.net.URL
 import com.google.transit.realtime.GtfsRealtime.FeedEntity
 import com.google.transit.realtime.GtfsRealtime.FeedMessage
-import java.net.URL
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,12 +33,18 @@ class MainActivity : AppCompatActivity() {
 
         Log.i("TESTING", "Latitude: $latitude\nLongitude: $longitude")
 
-        // Get GTFS data
-        val url = URL("https://gtfs.halifax.ca/realtime/Vehicle/VehiclePositions.pb")
-        val feed = FeedMessage.parseFrom(url.openStream())
-        for (entity : FeedEntity in feed.entityList) {
-            if (entity.hasTripUpdate()) {
-                Log.i("TESTING", "Entity ID: " + entity.id)
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                // Get GTFS data
+                val url = URL("https://gtfs.halifax.ca/realtime/Vehicle/VehiclePositions.pb")
+                val feed = FeedMessage.parseFrom(url.openStream())
+                for (entity : FeedEntity in feed.entityList) {
+                    Log.i("TESTING", "Route Number: " + entity.vehicle.trip.routeId.toString() + "\n" +
+                    "Latitude: " + entity.vehicle.position.latitude.toString() + "\n" +
+                    "Longitude: " + entity.vehicle.position.longitude.toString())
+                }
+            } catch (e: Exception) {
+                Log.i("TESTING", e.message.toString())
             }
         }
 
