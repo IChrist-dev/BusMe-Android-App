@@ -12,6 +12,7 @@ import com.example.transitapp.databinding.ActivityMainBinding
 import java.net.URL
 import com.google.transit.realtime.GtfsRealtime.FeedEntity
 import com.google.transit.realtime.GtfsRealtime.FeedMessage
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -20,6 +21,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -27,11 +29,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Get location from Start Activity Intent
-        val intent = intent
-        val latitude: Double = intent.getDoubleExtra("latitude", 0.0)
-        val longitude: Double = intent.getDoubleExtra("longitude", 0.0)
-
-        Log.i("TESTING", "Latitude: $latitude\nLongitude: $longitude")
+//        Commented out for now. Undecided about method for sharing device info
+//        val intent = intent
+//        val latitude = intent.getDoubleExtra("latitude", 0.0)
+//        val longitude = intent.getDoubleExtra("longitude", 0.0)
+//
+//        Log.i("TESTING", "Latitude: $latitude\nLongitude: $longitude")
 
         GlobalScope.launch(Dispatchers.IO) {
             try {

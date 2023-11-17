@@ -45,12 +45,16 @@ class StartActivity : AppCompatActivity() {
 
             fusedLocationProviderClient?.getCurrentLocation(PRIORITY_HIGH_ACCURACY, null)
                 ?.addOnSuccessListener { location ->
-                    val latitude = location.latitude
-                    val longitude = location.longitude
+                    // TODO: Using DeviceLocation class for time being. May change
+                    // val latitude = location.latitude
+                    // val longitude = location.longitude
+
+                    DeviceLocation.latitude = location.latitude
+                    DeviceLocation.longitude = location.longitude
 
                     val intent = Intent(this@StartActivity, MainActivity::class.java)
-                    intent.putExtra("latitude", latitude)
-                    intent.putExtra("longitude", longitude)
+                    //intent.putExtra("latitude", latitude)
+                    //intent.putExtra("longitude", longitude)
                     startActivity(intent)
                 }
         } else {

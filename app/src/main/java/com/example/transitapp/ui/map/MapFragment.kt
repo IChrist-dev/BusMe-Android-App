@@ -1,11 +1,15 @@
 package com.example.transitapp.ui.map
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.example.transitapp.DeviceLocation
 import com.example.transitapp.databinding.FragmentMapBinding
+import com.mapbox.maps.MapView
+import com.mapbox.maps.Style
 
 class MapFragment : Fragment() {
 
@@ -14,6 +18,7 @@ class MapFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+    var mapView : MapView? = null
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -24,7 +29,11 @@ class MapFragment : Fragment() {
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        binding.textHome.text = "This is the home fragment"
+        Log.i("TESTING", "Device Location: ${DeviceLocation.latitude}, ${DeviceLocation.longitude}")
+
+        // Set Mapbox object
+        mapView = binding.mapView
+        mapView?.getMapboxMap()?.loadStyleUri(Style.MAPBOX_STREETS)
 
         return root
     }
