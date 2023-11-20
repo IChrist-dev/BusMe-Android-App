@@ -29,27 +29,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Get location from Start Activity Intent
-//        Commented out for now. Undecided about method for sharing device info
-//        val intent = intent
-//        val latitude = intent.getDoubleExtra("latitude", 0.0)
-//        val longitude = intent.getDoubleExtra("longitude", 0.0)
-//
-//        Log.i("TESTING", "Latitude: $latitude\nLongitude: $longitude")
+        // Commented out for now. Undecided about method for sharing device info
+        val intent = intent
+        val latitude = intent.getDoubleExtra("latitude", 0.0)
+        val longitude = intent.getDoubleExtra("longitude", 0.0)
 
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                // Get GTFS data
-                val url = URL("https://gtfs.halifax.ca/realtime/Vehicle/VehiclePositions.pb")
-                val feed = FeedMessage.parseFrom(url.openStream())
-                for (entity : FeedEntity in feed.entityList) {
-                    Log.i("TESTING", "Route Number: " + entity.vehicle.trip.routeId.toString() + "\n" +
-                    "Latitude: " + entity.vehicle.position.latitude.toString() + "\n" +
-                    "Longitude: " + entity.vehicle.position.longitude.toString())
-                }
-            } catch (e: Exception) {
-                Log.i("TESTING", e.message.toString())
-            }
-        }
+        Log.i("TESTING", "---Device Location---\nLatitude: $latitude\nLongitude: $longitude")
 
         // Bottom Navigation View setup
         val navView: BottomNavigationView = binding.navView
@@ -59,6 +44,11 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(setOf(
                 R.id.navigation_map, R.id.navigation_routes, R.id.navigation_alerts))
+
+        var bundle = Bundle()
+        bundle.putSerializable("latitude", latitude)
+        bundle.putSerializable("longitude", longitude)
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
