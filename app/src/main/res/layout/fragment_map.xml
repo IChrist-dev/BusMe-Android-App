@@ -22,5 +22,6 @@
             app:mapbox_cameraTargetLat="44.6691917"
             app:mapbox_cameraTargetLng="-63.6134267"
             app:mapbox_cameraZoom="13.0" />
+
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

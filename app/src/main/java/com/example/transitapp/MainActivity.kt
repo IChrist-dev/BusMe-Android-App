@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         val appBarConfiguration = AppBarConfiguration(setOf(
                 R.id.navigation_map, R.id.navigation_routes, R.id.navigation_alerts))
 
-        var bundle = Bundle()
+        val bundle = Bundle()
         bundle.putSerializable("latitude", latitude)
         bundle.putSerializable("longitude", longitude)
 

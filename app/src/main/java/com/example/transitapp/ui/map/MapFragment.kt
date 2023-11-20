@@ -40,6 +40,8 @@ class MapFragment : Fragment() {
 
         getBusData()
 
+        val viewAnnotationManager = binding.mapView.viewAnnotationManager
+
         return root
     }
 
