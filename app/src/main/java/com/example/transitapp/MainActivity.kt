@@ -2,24 +2,25 @@ package com.example.transitapp
 
 import android.os.Bundle
 import android.util.Log
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.transitapp.databinding.ActivityMainBinding
-import java.net.URL
-import com.google.transit.realtime.GtfsRealtime.FeedEntity
-import com.google.transit.realtime.GtfsRealtime.FeedMessage
+import com.example.transitapp.ui.alerts.AlertsFragment
+import com.example.transitapp.ui.map.MapFragment
+import com.example.transitapp.ui.routes.RoutesFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    private var mapFragment : MapFragment? = null
+    private var alertsFragment : AlertsFragment? = null
+    private var routesFragment : RoutesFragment? = null
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,9 +46,14 @@ class MainActivity : AppCompatActivity() {
         val appBarConfiguration = AppBarConfiguration(setOf(
                 R.id.navigation_map, R.id.navigation_routes, R.id.navigation_alerts))
 
-        val bundle = Bundle()
-        bundle.putSerializable("latitude", latitude)
-        bundle.putSerializable("longitude", longitude)
+        val bundle = Bundle().apply {
+            putDouble("latitude", latitude)
+            putDouble("longitude", longitude)
+        }
+
+        mapFragment = MapFragment().apply {
+            arguments = bundle
+        }
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
