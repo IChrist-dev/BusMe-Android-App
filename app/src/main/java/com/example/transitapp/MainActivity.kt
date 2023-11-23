@@ -8,21 +8,13 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.transitapp.databinding.ActivityMainBinding
-import com.example.transitapp.ui.alerts.AlertsFragment
-import com.example.transitapp.ui.map.MapFragment
-import com.example.transitapp.ui.routes.RoutesFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.DelicateCoroutinesApi
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private var mapFragment : MapFragment? = null
-    private var alertsFragment : AlertsFragment? = null
-    private var routesFragment : RoutesFragment? = null
-
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -46,14 +38,12 @@ class MainActivity : AppCompatActivity() {
         val appBarConfiguration = AppBarConfiguration(setOf(
                 R.id.navigation_map, R.id.navigation_routes, R.id.navigation_alerts))
 
-        val bundle = Bundle().apply {
-            putDouble("latitude", latitude)
-            putDouble("longitude", longitude)
-        }
+        // Attach bundle to MapFragment args
+        val bundle = Bundle()
+        bundle.putDouble("latitude", latitude)
+        bundle.putDouble("longitude", longitude)
 
-        mapFragment = MapFragment().apply {
-            arguments = bundle
-        }
+        navController.navigate(R.id.navigation_map, bundle)
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)

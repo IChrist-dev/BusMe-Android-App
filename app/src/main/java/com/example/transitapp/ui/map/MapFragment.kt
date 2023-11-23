@@ -31,10 +31,10 @@ class MapFragment : Fragment() {
     private val binding get() = _binding!!
     private var mapView : MapView? = null
 
-    private var latitude : Double = 0.0
-    private var longitude : Double = 0.0
+    private var latitude : Double? = null
+    private var longitude : Double? = null
 
-    var feed : GtfsRealtime.FeedMessage? = null
+    private var feed : GtfsRealtime.FeedMessage? = null
 
     private lateinit var viewAnnotationManager : ViewAnnotationManager
 
@@ -45,6 +45,13 @@ class MapFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View {
 
+        // Get phone location from bundle and set camera position
+        arguments?.let {
+            latitude = it.getDouble("latitude")
+            longitude = it.getDouble("longitude")
+        }
+
+
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
@@ -54,20 +61,16 @@ class MapFragment : Fragment() {
         // Set Mapbox object
         mapView = binding.mapView
 
-        // Get phone location from bundle and set camera position
-        arguments?.let {
-            latitude = it.getDouble("latitude")
-            longitude = it.getDouble("longitude")
+        // Set camera position programmatically
+        if (latitude != null && longitude != null) {
+            val cameraPosition = CameraOptions.Builder()
+                .zoom(13.0)
+                .center(Point.fromLngLat(longitude!!, latitude!!))
+                .build()
+            Log.i("TESTING", "---Device Location (from Map Fragment)---" +
+                    "\nLatitude: $latitude Longitude: $longitude")
+            mapView!!.getMapboxMap().setCamera(cameraPosition)
         }
-
-        Log.i("WAHOO", "Latitude: $latitude Longitude: $longitude")
-
-        val cameraPosition = CameraOptions.Builder()
-            .zoom(13.0)
-            .center(latitude.let { longitude.let { it1 -> Point.fromLngLat(it, it1) } })
-            .build()
-
-        mapView!!.getMapboxMap().setCamera(cameraPosition)
 
         viewAnnotationManager = mapView!!.viewAnnotationManager
 
