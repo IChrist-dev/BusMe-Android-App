@@ -39,7 +39,7 @@ class MapFragment : Fragment() {
     private var longitude : Double? = null
 
     private val routesFileName = "saved_routes"
-    private val routesFile: File? = null
+    private var routesFile: File? = null
 
     private var feed : GtfsRealtime.FeedMessage? = null
 
@@ -48,7 +48,10 @@ class MapFragment : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
     private val updateBusLocationsRunnable = object : Runnable {
         override fun run() {
-            val readFromFile = routesFile?.readText().toString()
+            val internalStorageDir = requireContext().filesDir
+            routesFile = File(internalStorageDir, routesFileName)
+            val readFromFile = routesFile!!.readText()
+            Log.i("TESTING", "Contents:$readFromFile")
             fetchBusPositions(readFromFile)
             handler.postDelayed(this, 15000)
         }
@@ -65,7 +68,6 @@ class MapFragment : Fragment() {
             latitude = it.getDouble("latitude")
             longitude = it.getDouble("longitude")
         }
-
 
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -87,19 +89,19 @@ class MapFragment : Fragment() {
 
         // Access Saved Routes file
         val internalStorageDir = requireContext().filesDir
-        val routesFile = File(internalStorageDir, routesFileName)
+        routesFile = File(internalStorageDir, routesFileName)
         // Check if file exists
-        if (!routesFile.exists()) {
+        if (!routesFile!!.exists()) {
             try {
-                routesFile.createNewFile()
-                routesFile.appendText(",")
+                routesFile!!.createNewFile()
+                routesFile!!.appendText(",")
                 Log.i("TESTING", "Saved-Routes file created")
             } catch (e: IOException) {
                 Log.i("TESTING", "Error when creating file: ${e.message}")
             }
         }
 
-        val readFromFile = routesFile.readText()
+        val readFromFile = routesFile!!.readText()
 
         // Populate bus position feed
         mapView?.getMapboxMap()?.apply {
@@ -118,8 +120,6 @@ class MapFragment : Fragment() {
         // Populate bus position feed after the map style is loaded
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                // Clear all view annotations from previous cycle
-
                 // Get GTFS data
                 val url = URL("https://gtfs.halifax.ca/realtime/Vehicle/VehiclePositions.pb")
                 feed = GtfsRealtime.FeedMessage.parseFrom(url.openStream())
@@ -143,28 +143,6 @@ class MapFragment : Fragment() {
                         }
                     }
                 }
-                logBusData()
-            } catch (e: Exception) {
-                Log.i("TESTING", e.message.toString())
-            }
-        }
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun logBusData() {
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                // Get GTFS data
-                val url = URL("https://gtfs.halifax.ca/realtime/Vehicle/VehiclePositions.pb")
-                feed = GtfsRealtime.FeedMessage.parseFrom(url.openStream())
-                if (feed != null) {
-                    for (entity : GtfsRealtime.FeedEntity in feed!!.entityList) {
-                        Log.i("TESTING", "Route Number: " + entity.vehicle.trip.routeId.toString() + "\n" +
-                                "Latitude: " + entity.vehicle.position.latitude.toString() + "\n" +
-                                "Longitude: " + entity.vehicle.position.longitude.toString())
-                    }
-                }
-
             } catch (e: Exception) {
                 Log.i("TESTING", e.message.toString())
             }
