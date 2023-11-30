@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.transitapp.R
 import com.example.transitapp.databinding.FragmentMapBinding
 import com.google.transit.realtime.GtfsRealtime
@@ -54,9 +55,6 @@ class MapFragment : Fragment() {
 
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
-        // Retrieve bus info
-        logBusData()
 
         // Set Mapbox object
         mapView = binding.mapView

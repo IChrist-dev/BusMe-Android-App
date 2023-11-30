@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import com.example.transitapp.R
 import com.example.transitapp.databinding.FragmentRoutesBinding
 import java.io.File
+import java.io.IOException
 import java.nio.charset.Charset
 
 class RoutesFragment : Fragment() {
@@ -24,7 +25,7 @@ class RoutesFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val routesFile = "Saved_Routes_File.txt"
+    private val routesFileName = "Saved_Routes_File.txt"
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -39,17 +40,36 @@ class RoutesFragment : Fragment() {
         val autoTextView = root.findViewById<AutoCompleteTextView>(R.id.route_Autocomplete_TextView)
         val routesList = resources.getStringArray(R.array.bus_routes)
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, routesList)
-
         autoTextView.setAdapter(adapter)
 
         // Access routes-file to present and add buses
-        val file = File(context?.filesDir, routesFile)
-        // Set content of the saved routes report
+        val interalStorageDir = requireContext().filesDir
+        val routesFile = File(interalStorageDir, routesFileName)
+
+        routesFile.delete()
+        // Check if file exists
+        if (!routesFile.exists()) {
+            try {
+                routesFile.createNewFile()
+                Log.i("TESTING", "Saved-Routes file created")
+            } catch (e: IOException) {
+                Log.i("TESTING", "Error when creating file: ${e.message}")
+            }
+        }
+
+        // Setup scroll view for saved routes
         val savedRoutesLL = binding.savedRoutesLinearLayout
 
-        val readFromFile = file.readText()
+        // Get contents
+        var readFromFile = routesFile.readText()
         val fileSplit = readFromFile.split(",")
 
+        for (route in fileSplit) {
+            val routeTextView = TextView(requireContext());
+            val formattedRoute = route + "\n"
+            routeTextView.text = formattedRoute
+            savedRoutesLL.addView(routeTextView)
+        }
 
         val addRouteButton = binding.addRouteButton
         // Define button behaviour
@@ -58,8 +78,12 @@ class RoutesFragment : Fragment() {
                 val routeToSave = autoTextView.text
 
                 if (routeToSave.isNotEmpty()) {
-                    file.appendText("$routeToSave,")
+                    if (!readFromFile.contains(routeToSave)) {
+                        routesFile.appendText("$routeToSave,")
+                    }
 
+                    // Get updated contents of routes file
+                    readFromFile = routesFile.readText()
                     Log.i("TESTING", "Content in file: $readFromFile")
                 }
             }
