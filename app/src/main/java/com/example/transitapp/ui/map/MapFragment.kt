@@ -1,13 +1,14 @@
 package com.example.transitapp.ui.map
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.example.transitapp.R
 import com.example.transitapp.databinding.FragmentMapBinding
 import com.google.transit.realtime.GtfsRealtime
@@ -21,6 +22,8 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.IOException
 import java.net.URL
 
 class MapFragment : Fragment() {
@@ -35,12 +38,21 @@ class MapFragment : Fragment() {
     private var latitude : Double? = null
     private var longitude : Double? = null
 
-    private var routesFileName = "Saved_Routes_File.txt"
+    private val routesFileName = "saved_routes"
+    private val routesFile: File? = null
 
     private var feed : GtfsRealtime.FeedMessage? = null
 
     private lateinit var viewAnnotationManager : ViewAnnotationManager
 
+    private val handler = Handler(Looper.getMainLooper())
+    private val updateBusLocationsRunnable = object : Runnable {
+        override fun run() {
+            val readFromFile = routesFile?.readText().toString()
+            fetchBusPositions(readFromFile)
+            handler.postDelayed(this, 15000)
+        }
+    }
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -60,7 +72,6 @@ class MapFragment : Fragment() {
 
         // Set Mapbox object
         mapView = binding.mapView
-
         // Set camera position programmatically
         if (latitude != null && longitude != null) {
             val cameraPosition = CameraOptions.Builder()
@@ -74,37 +85,69 @@ class MapFragment : Fragment() {
 
         viewAnnotationManager = mapView!!.viewAnnotationManager
 
+        // Access Saved Routes file
+        val internalStorageDir = requireContext().filesDir
+        val routesFile = File(internalStorageDir, routesFileName)
+        // Check if file exists
+        if (!routesFile.exists()) {
+            try {
+                routesFile.createNewFile()
+                routesFile.appendText(",")
+                Log.i("TESTING", "Saved-Routes file created")
+            } catch (e: IOException) {
+                Log.i("TESTING", "Error when creating file: ${e.message}")
+            }
+        }
+
+        val readFromFile = routesFile.readText()
+
         // Populate bus position feed
         mapView?.getMapboxMap()?.apply {
             loadStyleUri(Style.MAPBOX_STREETS) {
-                // Populate bus position feed after the map style is loaded
-                GlobalScope.launch(Dispatchers.IO) {
-                    try {
-                        // Get GTFS data
-                        val url = URL("https://gtfs.halifax.ca/realtime/Vehicle/VehiclePositions.pb")
-                        feed = GtfsRealtime.FeedMessage.parseFrom(url.openStream())
-                        if (feed != null) {
-                            for (entity: GtfsRealtime.FeedEntity in feed!!.entityList) {
-                                // Convert lat-long to Point for use in annotation
-                                val point = Point.fromLngLat(
-                                    entity.vehicle.position.longitude.toDouble(),
-                                    entity.vehicle.position.latitude.toDouble()
-                                )
-                                val routeId = entity.vehicle.trip.routeId.toString()
-
-                                // Jump out of co-routine to access mapView and add this entity's annotation
-                                launch(Dispatchers.Main) {
-                                    addViewAnnotation(point, routeId)
-                                }
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Log.i("TESTING", e.message.toString())
-                    }
-                }
+                fetchBusPositions(readFromFile)
+                handler.postDelayed(updateBusLocationsRunnable, 15000)
             }
         }
+
         return root
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun fetchBusPositions(readFromFile: String) {
+        viewAnnotationManager.removeAllViewAnnotations()
+        // Populate bus position feed after the map style is loaded
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                // Clear all view annotations from previous cycle
+
+                // Get GTFS data
+                val url = URL("https://gtfs.halifax.ca/realtime/Vehicle/VehiclePositions.pb")
+                feed = GtfsRealtime.FeedMessage.parseFrom(url.openStream())
+                if (feed != null) {
+                    for (entity: GtfsRealtime.FeedEntity in feed!!.entityList) {
+                        // Convert lat-long to Point for use in annotation
+                        val point = Point.fromLngLat(
+                            entity.vehicle.position.longitude.toDouble(),
+                            entity.vehicle.position.latitude.toDouble()
+                        )
+                        val routeId = entity.vehicle.trip.routeId.toString()
+
+                        // Jump out of co-routine to access mapView and add this entity's annotation
+                        launch(Dispatchers.Main) {
+                            val formattedRoute = ",$routeId,"
+                            if (readFromFile.contains(formattedRoute)) {
+                                addViewAnnotation(point, routeId, true)
+                            } else {
+                                addViewAnnotation(point, routeId, false)
+                            }
+                        }
+                    }
+                }
+                logBusData()
+            } catch (e: Exception) {
+                Log.i("TESTING", e.message.toString())
+            }
+        }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -128,20 +171,24 @@ class MapFragment : Fragment() {
         }
     }
 
-    private fun addViewAnnotation(point: Point, routeId: String) {
+    private fun addViewAnnotation(point: Point, routeId: String, isSaved: Boolean) {
         // Define view annotation
         val viewAnnotation = viewAnnotationManager.addViewAnnotation(
             // Specify layout resource id
             resId = R.layout.map_annotation,
-
             // Set view options
             options = viewAnnotationOptions {
                 geometry(point)
             }
         )
 
+        // Annotation default is set in xml
+        if (isSaved) {
+            viewAnnotation.setBackgroundResource(R.drawable.map_route_widget_saved)
+        }
+
         // Get textView from annotation to update it with bus ID
-        val annotationTextView : TextView = viewAnnotation.findViewById(R.id.annotation)
+        val annotationTextView: TextView = viewAnnotation.findViewById(R.id.annotation)
         annotationTextView.text = routeId
     }
 
