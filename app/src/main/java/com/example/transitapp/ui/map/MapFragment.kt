@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.transitapp.R
 import com.example.transitapp.databinding.FragmentMapBinding
 import com.google.transit.realtime.GtfsRealtime
@@ -51,12 +52,11 @@ class MapFragment : Fragment() {
             val internalStorageDir = requireContext().filesDir
             routesFile = File(internalStorageDir, routesFileName)
             val readFromFile = routesFile!!.readText()
-            Log.i("TESTING", "Contents:$readFromFile")
             fetchBusPositions(readFromFile)
-            handler.postDelayed(this, 15000)
+            handler.postDelayed(this, 20000)
         }
     }
-    @OptIn(DelicateCoroutinesApi::class)
+
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -107,10 +107,9 @@ class MapFragment : Fragment() {
         mapView?.getMapboxMap()?.apply {
             loadStyleUri(Style.MAPBOX_STREETS) {
                 fetchBusPositions(readFromFile)
-                handler.postDelayed(updateBusLocationsRunnable, 15000)
+                handler.postDelayed(updateBusLocationsRunnable, 20000)
             }
         }
-
         return root
     }
 
@@ -118,7 +117,7 @@ class MapFragment : Fragment() {
     private fun fetchBusPositions(readFromFile: String) {
         viewAnnotationManager.removeAllViewAnnotations()
         // Populate bus position feed after the map style is loaded
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 // Get GTFS data
                 val url = URL("https://gtfs.halifax.ca/realtime/Vehicle/VehiclePositions.pb")

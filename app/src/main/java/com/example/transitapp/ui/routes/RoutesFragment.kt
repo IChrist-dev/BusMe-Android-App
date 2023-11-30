@@ -89,7 +89,6 @@ class RoutesFragment : Fragment() {
 
                 // Get updated contents of routes file
                 readFromFile = routesFile.readText()
-                Log.i("TESTING", "Content in file:$readFromFile")
             }
         }
 
