@@ -12,7 +12,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
 
-class StartActivity : AppCompatActivity() {
+class StartActivity: AppCompatActivity() {
 
     private var fusedLocationProviderClient: FusedLocationProviderClient? = null
 

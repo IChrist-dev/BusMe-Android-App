@@ -21,28 +21,27 @@ import com.mapbox.maps.viewannotation.ViewAnnotationManager
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.net.URL
 
-class MapFragment : Fragment() {
+class MapFragment: Fragment() {
 
     private var _binding: FragmentMapBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private var mapView : MapView? = null
+    private var mapView: MapView? = null
 
-    private var latitude : Double? = null
-    private var longitude : Double? = null
+    private var latitude: Double? = null
+    private var longitude: Double? = null
 
     private val routesFileName = "saved_routes"
     private var routesFile: File? = null
 
-    private var feed : GtfsRealtime.FeedMessage? = null
+    private var feed: GtfsRealtime.FeedMessage? = null
 
     private lateinit var viewAnnotationManager : ViewAnnotationManager
 

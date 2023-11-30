@@ -11,14 +11,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.transitapp.databinding.FragmentAlertsBinding
 import com.google.transit.realtime.GtfsRealtime
-import com.mapbox.geojson.Point
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.net.URL
 
-class AlertsFragment : Fragment() {
+class AlertsFragment: Fragment() {
 
     private var _binding: FragmentAlertsBinding? = null
 
@@ -59,7 +57,10 @@ class AlertsFragment : Fragment() {
                             val alertTextView = TextView(requireContext())
                             alertTextView.text = alert
                             alertTextView.textSize = 14F
-                            alertTextView.setTextColor(Color.BLACK)
+                            alertTextView.layoutParams = ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT
+                            )
                             alertsLinearLayout.addView(alertHeader)
                             alertsLinearLayout.addView(alertTextView)
                         }
