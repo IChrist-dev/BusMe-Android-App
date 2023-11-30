@@ -19,7 +19,7 @@
 
     <Button
         android:id="@+id/addRouteButton"
-        android:layout_width="wrap_content"
+        android:layout_width="90dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="ADD"
@@ -27,6 +27,16 @@
         app:layout_constraintHorizontal_bias="0.508"
         app:layout_constraintStart_toEndOf="@+id/route_Autocomplete_TextView"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/deleteRouteButton"
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="Delete"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/route_Autocomplete_TextView"
+        app:layout_constraintTop_toBottomOf="@+id/addRouteButton" />
 
     <TextView
         android:id="@+id/myRoutesTitleTextView"
@@ -42,20 +52,26 @@
         app:layout_constraintTop_toBottomOf="@+id/route_Autocomplete_TextView" />
 
     <ScrollView
-        android:layout_width="103dp"
-        android:layout_height="577dp"
+        android:layout_width="106dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.051"
+        app:layout_constraintHorizontal_bias="0.052"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/myRoutesTitleTextView"
-        app:layout_constraintVertical_bias="0.947">
+        app:layout_constraintVertical_bias="0.964">
 
         <LinearLayout
             android:id="@+id/savedRoutesLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

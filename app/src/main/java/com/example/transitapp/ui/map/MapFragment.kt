@@ -35,6 +35,8 @@ class MapFragment : Fragment() {
     private var latitude : Double? = null
     private var longitude : Double? = null
 
+    private var routesFileName = "Saved_Routes_File.txt"
+
     private var feed : GtfsRealtime.FeedMessage? = null
 
     private lateinit var viewAnnotationManager : ViewAnnotationManager
