@@ -29,9 +29,6 @@ import java.net.URL
 class MapFragment: Fragment() {
 
     private var _binding: FragmentMapBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
     private var mapView: MapView? = null
 

@@ -1,7 +1,6 @@
 package com.example.transitapp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -9,7 +8,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.transitapp.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
-
 
 class MainActivity: AppCompatActivity() {
 
@@ -22,12 +20,9 @@ class MainActivity: AppCompatActivity() {
         setContentView(binding.root)
 
         // Get location from Start Activity Intent
-        // Commented out for now. Undecided about method for sharing device info
         val intent = intent
         val latitude = intent.getDoubleExtra("latitude", 0.0)
         val longitude = intent.getDoubleExtra("longitude", 0.0)
-
-        Log.i("TESTING", "---Device Location---\nLatitude: $latitude\nLongitude: $longitude")
 
         // Bottom Navigation View setup
         val navView: BottomNavigationView = binding.navView

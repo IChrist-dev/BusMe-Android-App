@@ -94,8 +94,8 @@ class RoutesFragment : Fragment() {
 
         // Logic to delete routes from file
         val deleteRouteButton = binding.deleteRouteButton
-        // Define button behaviour
         deleteRouteButton.setOnClickListener {
+            // Define button behaviour
             val routeToDelete = autoTextView.text.toString()
 
             // Update array
